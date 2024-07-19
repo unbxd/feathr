@@ -517,7 +517,7 @@ class FeathrClient(object):
         host = self.redis_host
         port = self.redis_port
         ssl_enabled = self.redis_ssl_enabled
-        self.redis_client = redis.Redis(
+        self.redis_client = redis.RedisCluster(
             host=host, port=port, password=password, ssl=self._str_to_bool(ssl_enabled, "ssl_enabled")
         )
         self.logger.info("Redis connection is successful and completed.")
