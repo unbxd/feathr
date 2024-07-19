@@ -517,7 +517,11 @@ class FeathrClient(object):
         host = self.redis_host
         port = self.redis_port
         ssl_enabled = self.redis_ssl_enabled
-        if self._str_to_bool(os.environ.get('REDIS_CLUSTER_ENABLE', False),"REDIS_CLUSTER_ENABLE") == True:
+        resis_cluster_enabled = self._str_to_bool(os.environ.get('REDIS_CLUSTER_ENABLE', False),"REDIS_CLUSTER_ENABLE")
+        print("Harsh host", host)
+        print("Harsh host", port)
+        print("Harsh resis_cluster_enabled", resis_cluster_enabled)
+        if resis_cluster_enabled:
             self.redis_client = redis.RedisCluster(
                 host=host, port=port, password=password, ssl=self._str_to_bool(ssl_enabled, "ssl_enabled")
             )
@@ -525,6 +529,7 @@ class FeathrClient(object):
             self.redis_client = redis.Redis(
                 host=host, port=port, password=password, ssl=self._str_to_bool(ssl_enabled, "ssl_enabled")
             )
+        print("Harsh resis_cluster_enabled successful")
         self.logger.info("Redis connection is successful and completed.")
 
     def get_offline_features(
