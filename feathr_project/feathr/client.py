@@ -521,14 +521,18 @@ class FeathrClient(object):
         self.logger.error(f"Harsh host {host}")
         self.logger.error(f"Harsh port {port}")
         self.logger.error(f"Harsh resis_cluster_enabled {resis_cluster_enabled}")
-        if resis_cluster_enabled:
-            self.redis_client = redis.RedisCluster(
-                host=host, port=port, password=password, ssl=self._str_to_bool(ssl_enabled, "ssl_enabled")
-            )
-        else:
-            self.redis_client = redis.Redis(
-                host=host, port=port, password=password, ssl=self._str_to_bool(ssl_enabled, "ssl_enabled")
-            )
+        try:
+            if resis_cluster_enabled:
+                self.redis_client = redis.RedisCluster(
+                    host=host, port=port, password=password, ssl=self._str_to_bool(ssl_enabled, "ssl_enabled")
+                )
+            else:
+                self.redis_client = redis.Redis(
+                    host=host, port=port, password=password, ssl=self._str_to_bool(ssl_enabled, "ssl_enabled")
+                )
+        except Exception as e:
+            self.logger.error(f"Harsh redis not intialized successfully: {e}")
+            
         self.logger.error("Harsh resis_cluster_enabled successful")
         self.logger.info("Redis connection is successful and completed.")
 
