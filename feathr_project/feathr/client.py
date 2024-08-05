@@ -373,9 +373,9 @@ class FeathrClient(object):
             doesn't exist, then a None is returned for that feature. For example: {'12': [None, b'4.0', b'31.0',
             b'23.0'], '24': [b'true', b'4.0', b'31.0', b'23.0']}.
         """
+        redis_keys = [self._construct_redis_key(feature_table, key) for key in keys]
         with self.redis_client.pipeline() as redis_pipeline:
-            for key in keys:
-                redis_key = self._construct_redis_key(feature_table, key)
+            for redis_key in redis_keys:
                 redis_pipeline.hmget(redis_key, *feature_names)
             pipeline_result = redis_pipeline.execute()
 
@@ -517,9 +517,18 @@ class FeathrClient(object):
         host = self.redis_host
         port = self.redis_port
         ssl_enabled = self.redis_ssl_enabled
-        self.redis_client = redis.Redis(
-            host=host, port=port, password=password, ssl=self._str_to_bool(ssl_enabled, "ssl_enabled")
-        )
+        resis_cluster_enabled = self._str_to_bool(os.environ.get('REDIS_CLUSTER_ENABLE', False),"REDIS_CLUSTER_ENABLE")
+        try:
+            if resis_cluster_enabled:
+                self.redis_client = redis.RedisCluster(
+                    host=host, port=port, password=password, ssl=self._str_to_bool(ssl_enabled, "ssl_enabled")
+                )
+            else:
+                self.redis_client = redis.Redis(
+                    host=host, port=port, password=password, ssl=self._str_to_bool(ssl_enabled, "ssl_enabled")
+                )
+        except Exception as e:
+            self.logger.error(f"Redis not intialized successfully: {e}")
         self.logger.info("Redis connection is successful and completed.")
 
     def get_offline_features(
