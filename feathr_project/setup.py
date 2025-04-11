@@ -64,7 +64,7 @@ setup(
         "py4j<=0.10.9.7",
         "loguru<=0.6.0",
         "pandas",
-        "redis<=4.4.0",
+        "redis==4.4.4",
         "requests<=2.28.1",
         "tqdm<=4.64.1",
         "pyapacheatlas<=0.14.0",
